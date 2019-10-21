@@ -1,0 +1,6 @@
+[
+  "tests/test_auth.py::test_login",
+  "tests/test_auth.py::test_register",
+  "tests/test_factory.py::test_config",
+  "tests/test_factory.py::test_hello"
+]
