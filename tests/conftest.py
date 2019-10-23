@@ -1,5 +1,6 @@
 import pytest
 from app import create_app, db
+from app.models import User
 from config import Config
 
 
@@ -7,6 +8,7 @@ class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     ELASTICSEARCH_URL = None
+    WTF_CSRF_ENABLED = False
 
 
 @pytest.fixture
@@ -35,19 +37,30 @@ def runner(app):
     """A test runner for the app's Click commands."""
     return app.test_cli_runner()
 
+
 class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
     def login(self, username="test", password="test"):
         return self._client.post(
-            "/auth/login", data={"username": username, "password": password}
+            "/auth/login", data={"username": username, "password": password},
+            follow_redirects=True
         )
 
     def logout(self):
-        return self._client.get("/auth/logout")
+        return self._client.get("/auth/logout", follow_redirects=True)
 
 
 @pytest.fixture
 def auth(client):
     return AuthActions(client)
+
+
+@pytest.fixture
+def test_user():
+    u = User(username='test', email='test@example.com')
+    u.set_password('test')
+    db.session.add(u)
+    db.session.commit()
+    return u

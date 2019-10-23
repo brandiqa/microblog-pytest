@@ -21,4 +21,3 @@ setup(
     install_requires=["flask"],
     extras_require={"test": ["pytest", "coverage"]},
 )
-
