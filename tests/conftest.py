@@ -7,7 +7,6 @@ from config import Config
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
-    ELASTICSEARCH_URL = None
     WTF_CSRF_ENABLED = False
 
 
@@ -41,6 +40,11 @@ def runner(app):
 class AuthActions(object):
     def __init__(self, client):
         self._client = client
+        # Initialize Test User
+        u = User(username='test', email='test@example.com')
+        u.set_password('test')
+        db.session.add(u)
+        db.session.commit()
 
     def login(self, username="test", password="test"):
         return self._client.post(
@@ -55,12 +59,3 @@ class AuthActions(object):
 @pytest.fixture
 def auth(client):
     return AuthActions(client)
-
-
-@pytest.fixture
-def test_user():
-    u = User(username='test', email='test@example.com')
-    u.set_password('test')
-    db.session.add(u)
-    db.session.commit()
-    return u
