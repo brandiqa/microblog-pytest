@@ -18,3 +18,13 @@ def test_login_logout(client, auth):
     response = auth.logout()
     assert b'Please log in to access this page.' in response.data
     assert b'Sign In' in response.data
+
+
+# def test_registration(client, auth):
+    # Blank field values should not submit
+
+    # Duplicate username should display error message
+
+    # Unmatching passwords should not submit
+
+    # Unique username, matching passwords should succeed & redirect to login
