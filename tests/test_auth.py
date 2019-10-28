@@ -14,6 +14,10 @@ def test_login_logout(client, auth):
     response = auth.login()
     assert b'Hi, test!' in response.data
 
+    # Authenticated users shouldn't access login pages
+    response = client.get('/auth/login', follow_redirects=True)
+    assert b'Hi, test!' in response.data
+
     # Successful logout should redirect to login page
     response = auth.logout()
     assert b'Please log in to access this page.' in response.data
@@ -53,3 +57,9 @@ def test_registration(client, auth):
     assert b'Congratulations, you are now a registered user!' in response.data
     assert b'Sign In' in response.data
     # assert response.location == 'http://localhost/auth/login'
+
+    # Authenticated users shouldn't access register page
+    response = auth.login('susan', 'cat')
+    assert b'Hi, susan!' in response.data
+    response = client.get('/auth/register', follow_redirects=True)
+    assert b'Hi, susan!' in response.data
