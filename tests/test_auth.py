@@ -20,11 +20,36 @@ def test_login_logout(client, auth):
     assert b'Sign In' in response.data
 
 
-# def test_registration(client, auth):
+def register(client, username, email, password, password2):
+    return client.post('/auth/register',
+                       data=dict(username=username,
+                                 email=email,
+                                 password=password,
+                                 password2=password2),
+                       follow_redirects=True)
+
+
+def test_registration(client, auth):
+    # Registration page should render without template errors
+    response = client.get('/auth/register')
+    assert response.status_code == 200
+    assert b'Register' in response.data
+
     # Blank field values should not submit
+    response = client.post('/auth/register', follow_redirects=True)
+    assert b'This field is required' in response.data
 
     # Duplicate username should display error message
+    response = register(client, "test", "test@example.com", "test", "test")
+    assert b'Please use a different username' in response.data
+    assert b'Please use a different email address' in response.data
 
     # Unmatching passwords should not submit
+    response = register(client, "susan", "susan@example.com", "cat1", "cat2")
+    assert b'Field must be equal to password' in response.data
 
     # Unique username, matching passwords should succeed & redirect to login
+    response = register(client, "susan", "susan@example.com", "cat", "cat")
+    assert b'Congratulations, you are now a registered user!' in response.data
+    assert b'Sign In' in response.data
+    # assert response.location == 'http://localhost/auth/login'

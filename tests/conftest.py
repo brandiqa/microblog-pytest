@@ -33,6 +33,12 @@ def client(app):
 
 
 @pytest.fixture
+def req_ctx(app):
+    with app.test_request_context() as ctx:
+        yield ctx
+
+
+@pytest.fixture
 def runner(app):
     """A test runner for the app's Click commands."""
     return app.test_cli_runner()
