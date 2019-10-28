@@ -40,3 +40,4 @@ app.db
 microblog.log*
 
 .pytest_cache
+htmlcov
