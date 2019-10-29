@@ -13,6 +13,7 @@ def test_login_logout(client, auth):
     # Successful login should redirect to home page with user greeting
     response = auth.login()
     assert b'Hi, test!' in response.data
+    assert response.headers['Location'] == 'http://localhost/'
 
     # Authenticated users shouldn't access login pages
     response = client.get('/auth/login', follow_redirects=True)
