@@ -7,8 +7,8 @@ from config import Config
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    SERVER_NAME = 'localhost.test'
     WTF_CSRF_ENABLED = False
-    SERVER_NAME = 'localhost'
 
 
 @pytest.fixture
@@ -28,8 +28,7 @@ def app():
 
 @pytest.fixture
 def client(app):
-    client = app.test_client()
-    yield client
+    return app.test_client()
 
 
 @pytest.fixture
@@ -53,14 +52,22 @@ class AuthActions(object):
         db.session.add(u)
         db.session.commit()
 
-    def login(self, username="test", password="test"):
+    def login(self, username="test", password="test", redirect=True):
         return self._client.post(
             "/auth/login", data={"username": username, "password": password},
-            follow_redirects=True
+            follow_redirects=redirect
         )
 
-    def logout(self):
-        return self._client.get("/auth/logout", follow_redirects=True)
+    def logout(self, redirect=True):
+        return self._client.get("/auth/logout", follow_redirects=redirect)
+
+    def register(self, username, email, password, password2, redirect=True):
+        return self._client.post('/auth/register',
+                                 data=dict(username=username,
+                                           email=email,
+                                           password=password,
+                                           password2=password2),
+                                 follow_redirects=redirect)
 
 
 @pytest.fixture
